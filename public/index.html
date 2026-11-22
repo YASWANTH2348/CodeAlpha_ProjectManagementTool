@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f6f8">
+    <meta name="description" content="Kivo helps teams plan projects, assign work, and keep every conversation moving.">
+    <title>Kivo — Project work, in good flow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#" aria-label="Kivo home"><span class="brand-mark">k</span><span>Kivo</span><i>.</i></a>
+        <div class="workspace-switcher">
+          <span class="workspace-emblem">N</span>
+          <span><strong>Northstar Studio</strong><small>Workspace</small></span>
+          <span class="switcher-caret">⌄</span>
+        </div>
+        <nav class="side-nav" aria-label="Workspace navigation">
+          <button type="button" class="side-nav-link active" data-nav="board"><span class="nav-glyph">▦</span> Projects</button>
+          <button type="button" class="side-nav-link" data-nav="my-tasks"><span class="nav-glyph">☷</span> My tasks <span class="nav-count" id="my-task-count">0</span></button>
+          <button type="button" class="side-nav-link" id="sidebar-inbox"><span class="nav-glyph">◉</span> Inbox <span class="nav-unread" id="inbox-count" hidden></span></button>
+        </nav>
+        <div class="sidebar-section-heading"><span>YOUR PROJECTS</span><button type="button" id="sidebar-add-project" aria-label="Create project">＋</button></div>
+        <div class="project-list" id="project-list"></div>
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-footer">
+          <div class="connection-status"><span class="connection-dot" id="connection-dot"></span><span id="connection-label">Connecting…</span></div>
+          <div class="sidebar-user" id="sidebar-user"></div>
+        </div>
+      </aside>
+
+      <main class="main-area">
+        <header class="topbar">
+          <div class="breadcrumbs"><span>Workspace</span><b>/</b><strong id="breadcrumb-project">Projects</strong></div>
+          <div class="topbar-actions">
+            <label class="global-search">
+              <span aria-hidden="true">⌕</span>
+              <span class="visually-hidden">Search tasks</span>
+              <input id="task-search" type="search" placeholder="Search tasks">
+              <kbd>⌘ K</kbd>
+            </label>
+            <div class="notification-wrap">
+              <button class="notification-button" id="notification-toggle" type="button" aria-label="Notifications" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"></path></svg>
+                <span class="notification-badge" id="notification-badge" hidden></span>
+              </button>
+              <section class="notification-popover" id="notification-popover" hidden>
+                <div class="popover-heading"><div><span class="eyebrow">UPDATES</span><h2>Your inbox</h2></div><button type="button" id="mark-all-read">Mark all read</button></div>
+                <div class="notification-list" id="notification-list"></div>
+              </section>
+            </div>
+            <button type="button" class="topbar-avatar" id="topbar-avatar" aria-label="Your account">?</button>
+          </div>
+        </header>
+
+        <section class="welcome-state" id="welcome-state">
+          <span class="welcome-icon">✳</span>
+          <span class="eyebrow">A CALMER WAY TO GET THINGS DONE</span>
+          <h1>Good work happens<br><em>together.</em></h1>
+          <p>Bring your projects, people, and next steps into one clear space.</p>
+          <button class="button button-primary" type="button" data-open-auth>Sign in to your workspace <span aria-hidden="true">↗</span></button>
+        </section>
+
+        <section class="project-view" id="project-view" hidden>
+          <div class="project-heading">
+            <div class="project-title-block">
+              <div class="project-kicker"><span class="project-icon">✳</span><span id="project-kicker">TEAM PROJECT</span></div>
+              <h1 id="project-name">Project name</h1>
+              <p id="project-description"></p>
+              <div class="project-meta">
+                <span class="meta-date"><span aria-hidden="true">◷</span><span id="project-due-date">No due date</span></span>
+                <span class="meta-divider"></span>
+                <span class="meta-member-count" id="project-member-count"></span>
+                <div class="avatar-stack" id="project-avatars"></div>
+              </div>
+            </div>
+            <div class="project-actions">
+              <button class="button button-outline" id="invite-button" type="button"><span aria-hidden="true">＋</span> Invite</button>
+              <button class="button button-primary" id="add-task-button" type="button"><span aria-hidden="true">＋</span> Add task</button>
+              <button class="icon-more" type="button" aria-label="Project options">···</button>
+            </div>
+          </div>
+
+          <section class="project-summary">
+            <div class="summary-label"><span class="summary-mark">↗</span><span><strong id="progress-label">Project progress</strong><small id="progress-caption"></small></span></div>
+            <div class="progress-track"><span id="progress-bar"></span></div>
+            <strong class="progress-value" id="progress-value">0%</strong>
+          </section>
+
+          <div class="board-toolbar">
+            <div class="view-tabs" role="group" aria-label="Board view">
+              <button type="button" class="view-tab active" data-view="board"><span>▦</span> Board</button>
+              <button type="button" class="view-tab" data-view="activity"><span>◷</span> Activity</button>
+            </div>
+            <div class="board-tools-right">
+              <span class="drag-hint"><span>↕</span> Drag cards to update status</span>
+              <button class="tool-filter" type="button" id="filter-assignee-button"><span>☷</span> Filter</button>
+              <select id="assignee-filter" class="assignee-filter" aria-label="Filter tasks by assignee">
+                <option value="all">Everyone</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="board-columns" id="board-columns"></div>
+          <div class="activity-view" id="activity-view" hidden></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="auth-dialog" id="auth-dialog" aria-labelledby="auth-title">
+      <button class="dialog-close" type="button" data-close-dialog aria-label="Close sign in">×</button>
+      <div class="auth-visual"><span class="visual-orbit orbit-a"></span><span class="visual-orbit orbit-b"></span><span class="visual-brand">k.</span><span class="visual-wordmark">Kivo</span><span class="visual-caption">YOUR WORK, WITH MORE FLOW</span></div>
+      <div class="auth-content">
+        <span class="eyebrow" id="auth-eyebrow">WELCOME BACK</span>
+        <h2 id="auth-title">Good to see you.</h2>
+        <p id="auth-subtitle">Sign in to pick up where your team left off.</p>
+        <form id="auth-form">
+          <label class="form-field"><span>Username</span><input name="username" autocomplete="username" minlength="3" maxlength="24" required></label>
+          <label class="form-field" id="display-name-field" hidden><span>Your name</span><input name="displayName" autocomplete="name" minlength="2" maxlength="60"></label>
+          <label class="form-field"><span>Password</span><input name="password" type="password" autocomplete="current-password" minlength="8" maxlength="72" required></label>
+          <button class="button button-primary auth-submit" id="auth-submit" type="submit">Sign in <span aria-hidden="true">↗</span></button>
+          <p class="form-error" id="auth-error" aria-live="polite"></p>
+        </form>
+        <p class="auth-switch" id="auth-switch"></p>
+        <p class="demo-hint">Preview the workspace with <strong>alex</strong> / <strong>demo12345</strong>.</p>
+      </div>
+    </dialog>
+
+    <dialog class="form-dialog" id="project-dialog" aria-labelledby="project-dialog-title">
+      <button class="dialog-close" type="button" data-close-dialog aria-label="Close project dialog">×</button>
+      <span class="eyebrow">MAKE SPACE FOR GOOD WORK</span>
+      <h2 id="project-dialog-title">Create a project</h2>
+      <p class="dialog-intro">Give your team a clear place to plan and move forward.</p>
+      <form id="project-form">
+        <label class="form-field"><span>Project name</span><input name="name" maxlength="80" placeholder="e.g. Website relaunch" required></label>
+        <label class="form-field"><span>Short description</span><textarea name="description" maxlength="300" rows="3" placeholder="What are you working toward?"></textarea></label>
+        <label class="form-field"><span>Target date <small>(optional)</small></span><input name="dueDate" type="date"></label>
+        <p class="form-error" id="project-error" aria-live="polite"></p>
+        <button class="button button-primary form-submit" type="submit">Create project <span aria-hidden="true">↗</span></button>
+      </form>
+    </dialog>
+
+    <dialog class="form-dialog task-dialog" id="task-dialog" aria-labelledby="task-dialog-title">
+      <button class="dialog-close" type="button" data-close-dialog aria-label="Close task dialog">×</button>
+      <span class="eyebrow" id="task-dialog-eyebrow">PROJECT TASK</span>
+      <h2 id="task-dialog-title">Create a task</h2>
+      <form id="task-form">
+        <input type="hidden" name="taskId">
+        <label class="form-field"><span>Task title</span><input name="title" maxlength="120" placeholder="What needs to be done?" required></label>
+        <label class="form-field"><span>Details</span><textarea name="description" maxlength="1000" rows="3" placeholder="Add context for your team..."></textarea></label>
+        <div class="form-row">
+          <label class="form-field"><span>Status</span><select name="status"><option value="todo">To do</option><option value="in_progress">In progress</option><option value="done">Done</option></select></label>
+          <label class="form-field"><span>Priority</span><select name="priority"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
+        </div>
+        <div class="form-row">
+          <label class="form-field"><span>Assignee</span><select name="assigneeId" id="task-assignee"><option value="">Unassigned</option></select></label>
+          <label class="form-field"><span>Due date</span><input name="dueDate" type="date"></label>
+        </div>
+        <p class="form-error" id="task-error" aria-live="polite"></p>
+        <div class="task-form-actions"><button class="button button-primary form-submit" id="task-submit" type="submit">Create task <span aria-hidden="true">↗</span></button><button class="button button-danger" id="delete-task-button" type="button" hidden>Delete task</button></div>
+      </form>
+      <section class="task-discussion" id="task-discussion" hidden>
+        <div class="discussion-heading"><span class="eyebrow">TEAM DISCUSSION</span><span class="discussion-count" id="discussion-count"></span></div>
+        <div class="comment-list" id="comment-list"></div>
+        <form class="comment-form" id="comment-form">
+          <label class="visually-hidden" for="comment-content">Write a task comment</label>
+          <textarea id="comment-content" name="content" maxlength="600" rows="2" placeholder="Share an update or ask a question..." required></textarea>
+          <button class="button button-primary" type="submit">Send <span aria-hidden="true">↗</span></button>
+        </form>
+      </section>
+    </dialog>
+
+    <dialog class="form-dialog invite-dialog" id="invite-dialog" aria-labelledby="invite-title">
+      <button class="dialog-close" type="button" data-close-dialog aria-label="Close invite">×</button>
+      <span class="eyebrow">BETTER WORK, TOGETHER</span>
+      <h2 id="invite-title">Invite a teammate</h2>
+      <p class="dialog-intro">Add someone by their Kivo username.</p>
+      <form id="invite-form">
+        <label class="form-field"><span>Username</span><input name="username" maxlength="24" placeholder="e.g. priya" required></label>
+        <p class="form-error" id="invite-error" aria-live="polite"></p>
+        <button class="button button-primary form-submit" type="submit">Add to project <span aria-hidden="true">↗</span></button>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
